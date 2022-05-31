@@ -11,11 +11,11 @@
     <title>개시판</title>
 </head>
 <body>
-<nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top" th:replace="fragment/common :: menu('board')"/>
+<nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top" th:replace="fragment/common :: menu('elastic')"/>
 
     <div class="container">
         <h2>게시판</h2>
-        <div>총 건수 : <span th:text="${board.totalElements}"></span></div>
+        <div>총 건수 : <span th:text="${elastic.totalElements}"></span></div>
         <form class="form-inline d-flex justify-content-end" method="get" th:action="@{/board/list}">
             <div class="form-group mx-sm-3 mb-2">
                 <label for="searchText" class="sr-only">검색하기</label>
@@ -24,7 +24,7 @@
             <button type="submit" class="btn btn-secondary mb-2">검색</button>
         </form>
         <table class="table">
-            <!--<caption>JPA 테이블 가져와서 루프</caption>-->
+            <caption>JPA 테이블 가져와서 루프</caption>
             <thead>
             <tr>
                 <th scope="col">번호</th>
@@ -33,27 +33,27 @@
             </tr>
             </thead>
             <tbody>
-            <tr th:each="board : ${board}">
-                <td th:text="${board.id}"></td>
-                <td><a th:text="${board.title}" th:href="@{/board/form(id=${board.id})}"></a></td>
-                <td th:text="${board.user.username}">히로엄마</td>
+            <tr th:each="elastic : ${elastic}">
+                <td th:text="${elastic.id}"></td>
+                <td><a th:text="${elastic.title}" th:href="@{/elastic/elasticForm(id=${elastic.id})}"></a></td>
+                <td>히로엄마</td>
             </tr>
             </tbody>
         </table>
         <nav aria-label="Page navigation example">
             <ul class="pagination justify-content-center">
-                <li class="page-item" th:classappend="${1 == board.getPageable.pageNumber +1} ? 'disabled'">
-                    <a class="page-link" th:href="@{/board/list(page=${board.pageable.pageNumber -1 },searchText=${param.searchText})}" tabindex="-1" aria-disabled="true">Previous</a>
+                <li class="page-item" th:classappend="${1 == elastic.getPageable.pageNumber +1} ? 'disabled'">
+                    <a class="page-link" th:href="@{/board/list(page=${elastic.pageable.pageNumber -1 },searchText=${param.searchText})}" tabindex="-1" aria-disabled="true">Previous</a>
                 </li>
-                <li class="page-item" th:classappend="${i == board.getPageable.pageNumber +1} ? 'disabled'" th:each="i : ${#numbers.sequence(startPage,endPage)}">
-                    <a class="page-link" th:href="@{/board/list(page=${i -1 },searchText=${param.searchText})}" th:text="${i}">1</a></li>
-                <li class="page-item" th:classappend="${endPage == board.getPageable.pageNumber +1} ? 'disabled'">
-                    <a class="page-link" th:href="@{/board/list(page=${board.pageable.pageNumber +1 },searchText=${param.searchText})}">Next</a>
+                <li class="page-item" th:classappend="${i == elastic.getPageable.pageNumber +1} ? 'disabled'" th:each="i : ${#numbers.sequence(startPage,endPage)}">
+                    <a class="page-link" th:href="@{/elastic/elasticList(page=${i -1 },searchText=${param.searchText})}" th:text="${i}">1</a></li>
+                <li class="page-item" th:classappend="${endPage == elastic.getPageable.pageNumber +1} ? 'disabled'">
+                    <a class="page-link" th:href="@{/elastic/elasticList(page=${elastic.pageable.pageNumber +1 },searchText=${param.searchText})}">Next</a>
                 </li>
             </ul>
         </nav>
         <div class="text-right">
-            <a type="button" class="btn btn-warning" th:href="@{/board/form}">글쓰기</a>
+            <a type="button" class="btn btn-warning" th:href="@{/elastic/elasticForm}">글쓰기</a>
         </div>
     </div>
 
@@ -63,16 +63,11 @@
 <!-- Option 1: jQuery and Bootstrap Bundle (includes Popper) -->
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ho+j7jyWK8fNQe+A12Hb8AhRq26LrZ/JpcUGGOn+Y7RsweNrtN/tE3MoK7ZeZDyx" crossorigin="anonymous"></script>
-<script>
-    // checkKeyword1 = setInterval(function (){
-    //
-    //     let searchText = document.getElementById('searchText')
-    //     if(searchText = null){
-    //
-    //     }else{
-    //         console.log("검색어 입력")
-    //     }
-    // },1000)
-</script>
+
+<!-- Option 2: jQuery, Popper.js, and Bootstrap JS
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js" integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.min.js" integrity="sha384-w1Q4orYjBQndcko6MimVbzY0tgp4pWB4lZ7lr30WKz0vr/aWKhXdBNmNb5D92v7s" crossorigin="anonymous"></script>
+-->
 </body>
 </html>

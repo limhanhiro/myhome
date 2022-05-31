@@ -1,0 +1,42 @@
+
+body {
+  padding-top: 5rem;
+}
+.starter-template {
+  padding: 3rem 1.5rem;
+  text-align: center;
+}
+
+.hide {
+  display: none !important;	/* 사용자가 아무것도 입력하지 않았을 때 검색창을 숨기는 용도*/
+}
+
+.rel_search {
+  display:flex;
+  position: fixed;
+  margin-left: -50px;
+  margin-top: 380px;
+  flex-direction:column;
+  justify-content : space-around;
+  border: 0.5px solid black;
+
+
+}
+
+.pop_rel_keywords {
+  list-style: none;
+  width: 400px;
+  list-style: none;
+  margin-right: 30%;
+  background: white;
+  margin-bottom: 0px;
+
+}
+
+.pop_rel_keywords > li {	/* JS에서 동적으로 li를 생성할 때 적용될 스타일*/
+  line-height : 200%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+
+}

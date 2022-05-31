@@ -1,0 +1,141 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragment/common :: head('개시판')">
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
+    <link href="../../static/css/starter-template.css" th:href="@{/static/css/starter-template.css}" rel="stylesheet">
+    <title>개시판</title>
+</head>
+<body>
+<nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top" th:replace="fragment/common :: menu('jejumul4')"/>
+
+    <div class="list-group" style="width: 200px;position: fixed; top:200px; left: 1600px;" >
+        <span style="margin: 0 auto;">인기검색어</span>
+        <a class="list-group-item list-group-item-action"
+           style="margin: 0 auto;"
+           th:each="populars : ${populars}"
+           th:href="@{/elastic/search(sort='com',field='t',searchTerm=${populars.key},page=0,log='__')}">
+            <span th:text="${populars.row} +' 위'" style="font-weight: bold; width: 30px;"></span>
+            <span th:text="${populars.key}"></span>
+           <!--<span th:text="${populars.doc_count}+ '회'" style="margin-left: 20px;"></span>-->
+        </a>
+    </div>
+    <div class="container">
+        <h2>엘라스틱    게시판</h2>
+        <div th:if="${total} == 'total'"><span>전체검색</span></div>
+        <div th:unless="${total} == 'total'">총 건수 : <span th:text="${total}"></span></div>
+        <form class="form-inline d-flex justify-content-end" method="get" th:action="@{/jejumul4/search}">
+            <select id="sort" name="sort" style="margin-right: 5px;">
+                <option th:value="com" th:selected="${sort} == 'com'" >정확도순</option>
+                <option th:value="rec" th:selected="${sort} == 'rec'">최신순</option>
+            </select>
+            <select id="field" name="field">
+                <option th:value="t" th:selected="${field} == 't'">제목</option>
+                <option th:value="c" th:selected="${field} == 'c'">내용</option>
+                <option th:value="tc" th:selected="${field} == 'tc'">제목+내용</option>
+            </select>
+            <div class="form-group mx-sm-3 mb-2">
+                <label for="searchTerm" class="sr-only">검색하기</label>
+                <input type="text" class="form-control" id="searchTerm" name="searchTerm" th:value="${param.searchTerm}">
+
+                <!--<div style="background: white; position: absolute; margin-top: 0px; margin-left: 0px; z-index: 100;" id="autoComplete"></div>-->
+                <input type="hidden" id="page" name="page" value="0">
+                <input type="hidden" id="log" name="log" value="^^">
+                <div class = "rel_search hide">
+                    <ul class="pop_rel_keywords">
+                    </ul>
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-secondary mb-2">검색</button>
+        </form>
+
+        <table class="table">
+            <caption>제주 관광 공사</caption>
+            <thead>
+            <tr>
+                <th scope="col">번호</th>
+                <th scope="col">제목</th>
+                <th scope="col">작성자</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="elastic : ${elastic}">
+                <td th:text="${elastic.row + page*10}"></td>
+                <td><a th:text="${elastic.TITLE}" th:href="@{/elastic/elasticForm(ID=${elastic.ID})}"></a></td>
+                <td th:text="${elastic.WRITER}"></td>
+            </tr>
+            </tbody>
+        </table>
+        <nav aria-label="Page navigation example">
+            <ul class="pagination justify-content-center">
+                <li class="page-item" th:classappend="${0 == page} ? 'disabled'">
+                    <a class="page-link" th:href="@{/jejumul4/search(sort=${sort},field=${param.field},searchTerm=${param.searchTerm},page=${page -1 },log='__')}" tabindex="-1" aria-disabled="true">Previous</a>
+                </li>
+                <li class="page-item" th:classappend="${i == page +1} ? 'disabled'" th:each="i : ${#numbers.sequence(startPage,endPage)}">
+                    <a class="page-link" th:href="@{/jejumul4/search(sort=${sort},field=${param.field},searchTerm=${param.searchTerm},page=${i -1},log='__')}" th:text="${i}">1</a></li>
+                <li class="page-item" th:classappend="${endPage == page+1 } ? 'disabled'">
+                    <a class="page-link" th:href="@{/jejumul4/search(sort=${sort},field=${param.field},searchTerm=${param.searchTerm},page=${page +1 },log='__')}">Next</a>
+                </li>
+            </ul>
+        </nav>
+        <div class="text-right">
+            <a type="button" class="btn btn-warning" th:href="@{/elastic/elasticForm}">글쓰기</a>
+        </div>
+    </div>
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ho+j7jyWK8fNQe+A12Hb8AhRq26LrZ/JpcUGGOn+Y7RsweNrtN/tE3MoK7ZeZDyx" crossorigin="anonymous"></script>
+<footer th:replace="fragment/common :: footer"/>
+<script>
+    $(document).ready(function (){
+        let timeout = null;
+
+        $('#searchTerm').keydown(function (){
+            clearTimeout(timeout);
+            timeout = setTimeout(function (){
+                $('.pop_rel_keywords').empty();
+                let searchTerm = $('#searchTerm').val();
+                let recommend = "";
+                $.ajax({
+                    url: "/jejumul4/autoComplete",
+                    type: "post",
+                    data: {"searchTerm" : searchTerm},
+                    success: function (data){
+                        if(data.length>0){
+                            $('.rel_search').removeClass('hide');
+                            for(let i=0; i<data.length; i++){
+                                recommend += " <li onclick='select(this)'"+">"+data[i].keyword+"</li>";
+                            }
+                            $('.pop_rel_keywords').append(recommend);
+                        }else {
+                            $('.rel_search').addClass('hide');
+                        }
+
+                    },
+                    error: function () {
+                        console.log("에러");
+                    }
+
+                });
+            },500);
+
+        })
+    })
+    function select(a){
+        console.log("클릭이벤트");
+        let test = a.innerHTML;
+        console.log(test);
+        $('#searchTerm').val(test);
+    }
+    $("li [name='select']").click(function (){
+        console.log("클릭이벤트");
+
+    })
+
+</script>
+</body>
+</html>
